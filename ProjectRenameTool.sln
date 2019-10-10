@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29403.142
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{91BAB3E1-9497-4A72-B7F7-7158A9AAF7A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectRenameTool.Console", "src\ProjectRenameTool.Console\ProjectRenameTool.Console.csproj", "{B0E0DF05-A7DD-4B82-8566-9BD69C26109A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B0E0DF05-A7DD-4B82-8566-9BD69C26109A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0E0DF05-A7DD-4B82-8566-9BD69C26109A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0E0DF05-A7DD-4B82-8566-9BD69C26109A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0E0DF05-A7DD-4B82-8566-9BD69C26109A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B0E0DF05-A7DD-4B82-8566-9BD69C26109A} = {91BAB3E1-9497-4A72-B7F7-7158A9AAF7A9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {43168CEF-744D-45C5-93AC-67708A8061C4}
+	EndGlobalSection
+EndGlobal
