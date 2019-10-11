@@ -80,7 +80,7 @@ namespace ProjectRenameTool.Console
             WriteLine($"{Environment.NewLine}请先配置程序目录下的 appsettings.json 文件（该文件）。");
 
             ResetColor();
-            Write($"{Environment.NewLine}配置完成？任意键继续...");
+            WriteLine($"{Environment.NewLine}配置完成？任意键继续...");
             ReadKey();
 
             var builder = new ConfigurationBuilder()
