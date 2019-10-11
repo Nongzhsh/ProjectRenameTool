@@ -29,6 +29,8 @@ namespace ProjectRenameTool.Console
 
         public void Run()
         {
+            WriteLine($@"ReplacementOptions：{Environment.NewLine}{_replacementOptions}{Environment.NewLine}");
+
             LoadIgnoreGlobRules();
             ReplaceAll();
         }
@@ -50,7 +52,6 @@ namespace ProjectRenameTool.Console
 
         private void ReplaceAll()
         {
-            WriteLine($"正在读取 {_replacementOptions.SourcePath} 文件列表");
             if (_replacementOptions.SourcePath.IsZipFile())
             {
                 ReplaceInZipFile();
@@ -108,8 +109,6 @@ namespace ProjectRenameTool.Console
 
             var ignoreFiles = rootFolder.GetFiles(".gitignore", SearchOption.AllDirectories);
             _ignoreCopyParser.AddIgnoreFiles(ignoreFiles);
-
-            WriteLine($"{Environment.NewLine}正在替换文件名称/内容");
 
             CopyAndReplace(rootFolder);
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Timers;
 using Awesome.Net.WritableOptions.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +15,15 @@ namespace ProjectRenameTool.Console
 
         static void Main()
         {
+            WindowWidth = 120;
+            BufferHeight = 1000;
+
+            ForegroundColor = ConsoleColor.Green;
+            WriteLine("该程序通过应用.gitignore文件的忽略规则来选择性查找并替换文件（夹）的名称和内容。");
+            WriteLine("关于 .gitignore 请参阅：https://git-scm.com/docs/gitignore。");
+            ResetColor();
+            WriteLine();
+
             var config = BuildConfiguration();
             var services = new ServiceCollection();
             ConfigureServices(services, config);
@@ -24,9 +32,11 @@ namespace ProjectRenameTool.Console
 
             AppDomain.CurrentDomain.UnhandledException += (s, e) =>
             {
+                ForegroundColor = ConsoleColor.Red;
                 WriteLine($"{Environment.NewLine}发生以下错误：");
-                var message = $"{Environment.NewLine}{DateTime.Now} [Error]:{Environment.NewLine}{e.ExceptionObject}";
-                WriteLine(message);
+                WriteLine(((Exception)e.ExceptionObject).Message);
+                ResetColor();
+
                 WriteLine($"{Environment.NewLine}任意键退出...");
                 ReadKey();
                 Environment.Exit(-1);
@@ -55,6 +65,13 @@ namespace ProjectRenameTool.Console
             if (!File.Exists(appConfigJsonPath))
             {
                 JsonFileHelper.AddOrUpdateSection(appConfigJsonPath, nameof(ReplacementOptions), new ReplacementOptions());
+
+                ForegroundColor = ConsoleColor.Yellow;
+                WriteLine($"{Environment.NewLine}请先配置程序目录下的 appsettings.json 文件。");
+
+                ResetColor();
+                WriteLine($"{Environment.NewLine}配置完成？任意键继续...");
+                ReadKey();
             }
 
             var builder = new ConfigurationBuilder()
