@@ -25,7 +25,7 @@ namespace ProjectRenameTool.Console.Replacing
         /// <summary>
         /// 项目或解决方案路径
         /// </summary>
-        public string SourcePath { get; set; } = @"可以是.zip文件或已解压的原项目文件夹的路径，注意路径分隔符为\\";
+        public string SourcePath { get; set; } = @"可以是.zip文件或已解压的原项目文件夹的路径，注意路径分隔符为\";
 
         /// <summary>
         /// 自定义忽略拷贝规则（同.gitignore 格式）

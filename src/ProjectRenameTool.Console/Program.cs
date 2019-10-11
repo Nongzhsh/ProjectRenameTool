@@ -21,6 +21,7 @@ namespace ProjectRenameTool.Console
             ForegroundColor = ConsoleColor.Green;
             WriteLine("该程序通过应用.gitignore文件的忽略规则来选择性查找并替换文件（夹）的名称和内容。");
             WriteLine("关于 .gitignore 请参阅：https://git-scm.com/docs/gitignore。");
+            WriteLine($"{Environment.NewLine}提示：如果 appsettings.json 文件不存在，下次启动程序时将自动生成。");
             ResetColor();
             WriteLine();
 
@@ -37,7 +38,7 @@ namespace ProjectRenameTool.Console
                 WriteLine(((Exception)e.ExceptionObject).Message);
                 ResetColor();
 
-                WriteLine($"{Environment.NewLine}任意键退出...");
+                Write($"{Environment.NewLine}任意键退出...");
                 ReadKey();
                 Environment.Exit(-1);
             };
@@ -65,14 +66,22 @@ namespace ProjectRenameTool.Console
             if (!File.Exists(appConfigJsonPath))
             {
                 JsonFileHelper.AddOrUpdateSection(appConfigJsonPath, nameof(ReplacementOptions), new ReplacementOptions());
-
-                ForegroundColor = ConsoleColor.Yellow;
-                WriteLine($"{Environment.NewLine}请先配置程序目录下的 appsettings.json 文件。");
-
-                ResetColor();
-                WriteLine($"{Environment.NewLine}配置完成？任意键继续...");
-                ReadKey();
             }
+            else
+            {
+                WriteLine("是否重新生成 appsettings.json 文件？ Y/任意键");
+                if (ReadLine().Trim().ToLower() == "y")
+                {
+                    JsonFileHelper.AddOrUpdateSection(appConfigJsonPath, nameof(ReplacementOptions), new ReplacementOptions());
+                }
+            }
+
+            ForegroundColor = ConsoleColor.Yellow;
+            WriteLine($"{Environment.NewLine}请先配置程序目录下的 appsettings.json 文件（该文件）。");
+
+            ResetColor();
+            Write($"{Environment.NewLine}配置完成？任意键继续...");
+            ReadKey();
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(BasePath)
