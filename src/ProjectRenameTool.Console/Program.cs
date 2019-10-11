@@ -22,14 +22,8 @@ namespace ProjectRenameTool.Console
 
             #region 开始处理
 
-            WriteLine("开始处理");
-            var timer = new Timer(1 * 1000);
-            timer.Elapsed += (s, e) => { Write("."); };
-            timer.Enabled = true;
-
             AppDomain.CurrentDomain.UnhandledException += (s, e) =>
             {
-                timer.Enabled = false;
                 WriteLine($"{Environment.NewLine}发生以下错误：");
                 var message = $"{Environment.NewLine}{DateTime.Now} [Error]:{Environment.NewLine}{e.ExceptionObject}";
                 WriteLine(message);
@@ -45,9 +39,8 @@ namespace ProjectRenameTool.Console
             renamer.Run();
 
             watch.Stop();
-            timer.Enabled = false;
 
-            WriteLine($"{Environment.NewLine}处理完成（{watch.Elapsed.TotalMinutes} 分钟）");
+            WriteLine($"{Environment.NewLine}已完成，耗时 {watch.Elapsed.TotalSeconds} 秒。");
 
             #endregion
             ReadKey();

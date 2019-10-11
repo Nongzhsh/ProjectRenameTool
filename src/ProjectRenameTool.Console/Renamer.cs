@@ -14,23 +14,21 @@ namespace ProjectRenameTool.Console
 {
     public class Renamer
     {
-        private string _outputFolderPath;
-
         private readonly ReplacementOptions _replacementOptions;
         private readonly IgnoreParser _ignoreCopyParser = new IgnoreParser("CopyParser");
         private readonly IgnoreParser _ignoreReplaceParser = new IgnoreParser("ReplaceParser");
-        private readonly FileEntryList _files = new FileEntryList(new List<FileEntry>());
+
+        private string _outputFolderPath;
+        private readonly FileEntryList _outputFileEntryList = new FileEntryList(new List<FileEntry>());
 
         public Renamer(IWritableOptions<ReplacementOptions> options)
         {
             _replacementOptions = options.Value;
+            _outputFolderPath = _replacementOptions.OutputFolderPath;
         }
 
         public void Run()
         {
-            _outputFolderPath = _replacementOptions.OutputFolderPath;
-            Directory.CreateDirectory(_outputFolderPath);
-
             LoadIgnoreGlobRules();
             ReplaceAll();
         }
@@ -52,7 +50,7 @@ namespace ProjectRenameTool.Console
 
         private void ReplaceAll()
         {
-            WriteLine($"{Environment.NewLine}正在读取 {_replacementOptions.SourcePath} 文件列表");
+            WriteLine($"正在读取 {_replacementOptions.SourcePath} 文件列表");
             if (_replacementOptions.SourcePath.IsZipFile())
             {
                 ReplaceInZipFile();
@@ -65,12 +63,7 @@ namespace ProjectRenameTool.Console
 
         private void ReplaceInZipFile()
         {
-            var sourceFile = new FileInfo(_replacementOptions.SourcePath);
-            _outputFolderPath = Path.Combine(_replacementOptions.OutputFolderPath, $"new-{sourceFile.Name}");
-
-            sourceFile.CopyTo(_outputFolderPath, true).LastWriteTime = DateTime.Now;
-
-            var entries = _outputFolderPath.ToFileEntryList();
+            var entries = _replacementOptions.SourcePath.ToFileEntryList();
             var ignoreFiles = entries.Where(x => x.Name.EndsWith(".gitignore"));
 
             foreach (var fileEntry in ignoreFiles)
@@ -86,27 +79,38 @@ namespace ProjectRenameTool.Console
                 }
 
                 var newEntry = Replace(fileEntry.Name, fileEntry);
-                _files.Add(newEntry);
+                _outputFileEntryList.Add(newEntry);
             }
 
-            _files.SaveToZipFile(_outputFolderPath);
+            var sourceFile = new FileInfo(_replacementOptions.SourcePath);
+            var newFileName = ReplacementHelper.ReplaceText(sourceFile.Name, _replacementOptions.Rules);
+
+            var outputZipFilePath = newFileName;
+            if (!_outputFolderPath.EndsWith(newFileName))
+            {
+                outputZipFilePath = Path.Combine(_outputFolderPath, $"{newFileName}");
+            }
+
+            _outputFileEntryList.SaveToZipFile(outputZipFilePath);
         }
 
         private void ReplaceInDirectory()
         {
             var rootFolder = new DirectoryInfo(_replacementOptions.SourcePath);
+            var newFolderName = ReplacementHelper.ReplaceText(rootFolder.Name, _replacementOptions.Rules);
 
-            var ignoreFiles = rootFolder.GetFiles(".gitignore", SearchOption.AllDirectories);
-            _ignoreCopyParser.AddIgnoreFiles(ignoreFiles);
-
-            if (_outputFolderPath == Environment.GetFolderPath(Environment.SpecialFolder.Desktop))
+            if (!_outputFolderPath.TrimEnd(Path.DirectorySeparatorChar).EndsWith(newFolderName))
             {
-                _outputFolderPath = Path.Combine(_outputFolderPath, $"new-{rootFolder.Name}");
+                _outputFolderPath = Path.Combine(_outputFolderPath, $"{newFolderName}");
             }
 
             Directory.CreateDirectory(_outputFolderPath);
 
+            var ignoreFiles = rootFolder.GetFiles(".gitignore", SearchOption.AllDirectories);
+            _ignoreCopyParser.AddIgnoreFiles(ignoreFiles);
+
             WriteLine($"{Environment.NewLine}正在替换文件名称/内容");
+
             CopyAndReplace(rootFolder);
 
             //TODO:保存 zip？
@@ -132,9 +136,10 @@ namespace ProjectRenameTool.Console
 
                     var newFilePath = Path.Combine(_outputFolderPath, entry.Name.TrimStart(Path.DirectorySeparatorChar));
                     Directory.CreateDirectory(Path.GetDirectoryName(newFilePath));
+
                     File.WriteAllBytes(newFilePath, entry.Bytes);
 
-                    _files.Add(entry);
+                    _outputFileEntryList.Add(entry);
                 }
             }
 
@@ -153,7 +158,7 @@ namespace ProjectRenameTool.Console
                 var newDirPath = Path.Combine(_outputFolderPath, entry.Name.TrimStart(Path.DirectorySeparatorChar));
                 Directory.CreateDirectory(newDirPath);
 
-                _files.Add(entry);
+                _outputFileEntryList.Add(entry);
 
                 CopyAndReplace(dir);
             }
@@ -167,25 +172,27 @@ namespace ProjectRenameTool.Console
                 {
                     // 它的路径还是要替换的
 
-                    var oldPath = entry.Name.Replace('/', '\\').TrimEnd('\\');
-                    var postName = oldPath.Split('\\').Last();
+                    var oldPath = entry.Name.Replace('/', Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar);
+                    var postName = oldPath.Split(Path.DirectorySeparatorChar).Last();
                     var newPrePath = ReplacementHelper.ReplaceText(oldPath.RemovePostFix(postName), _replacementOptions.Rules);
 
-                    if (newPrePath != "\\")
+                    if (newPrePath != Path.DirectorySeparatorChar.ToString())
                     {
                         var newName = Path.Combine(newPrePath, postName);
 
-                        if (entry.Name.EndsWith('\\'))
+                        if (entry.Name.EndsWith(Path.DirectorySeparatorChar))
                         {
-                            newName = newName.EnsureEndsWith('\\');
+                            newName = newName.EnsureEndsWith(Path.DirectorySeparatorChar);
                         }
 
                         entry.SetName(newName);
+                        WriteLine($"已处理：{entry}");
                     }
                 }
                 else
                 {
                     ReplacementHelper.Replace(entry, _replacementOptions.Rules);
+                    WriteLine($"已处理：{entry}");
                 }
             }
 

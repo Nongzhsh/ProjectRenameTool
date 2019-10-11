@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 
 namespace ProjectRenameTool.Console.Files
@@ -35,39 +34,15 @@ namespace ProjectRenameTool.Console.Files
             }
         }
 
-        public static void SaveToZipFile(this FileEntryList fileEntryList, string outputFolderPath)
+        public static void SaveToZipFile(this FileEntryList fileEntryList, string outputZipFilePath)
         {
             var zipContent = fileEntryList.CreateZipFileFromEntries();
             using (var templateFileStream = new MemoryStream(zipContent))
             {
-                using (var zipInputStream = new ZipInputStream(templateFileStream))
+                using (var fileStream = new FileStream($@"{outputZipFilePath}", FileMode.Create))
                 {
-                    var zipEntry = zipInputStream.GetNextEntry();
-                    while (zipEntry != null)
-                    {
-                        var fullZipToPath = Path.Combine(outputFolderPath, zipEntry.Name);
-                        var directoryName = Path.GetDirectoryName(fullZipToPath);
-
-                        if (!string.IsNullOrEmpty(directoryName))
-                        {
-                            Directory.CreateDirectory(directoryName);
-                        }
-
-                        var fileName = Path.GetFileName(fullZipToPath);
-                        if (fileName.Length == 0)
-                        {
-                            zipEntry = zipInputStream.GetNextEntry();
-                            continue;
-                        }
-
-                        var buffer = new byte[4096]; // 4K is optimum
-                        using (var streamWriter = File.Create(fullZipToPath))
-                        {
-                            StreamUtils.Copy(zipInputStream, streamWriter, buffer);
-                        }
-
-                        zipEntry = zipInputStream.GetNextEntry();
-                    }
+                    templateFileStream.Seek(0, SeekOrigin.Begin);
+                    templateFileStream.CopyTo(fileStream);
                 }
             }
         }
