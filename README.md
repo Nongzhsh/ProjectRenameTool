@@ -6,3 +6,8 @@ Rename the project\solution by applying the rules of the .gitignore file.
 其原理是通过应用.gitignore文件的忽略规则来选择性查找并替换文件（夹）的名称和内容，
 关于 .gitignore 请参阅：https://git-scm.com/docs/gitignore。
 
+如果想编译打包成单个 .exe 文件可以使用以下命令打包：
+
+```PM
+dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true
+```
