@@ -52,13 +52,29 @@ namespace ProjectRenameTool.Console
 
         private void ReplaceAll()
         {
-            if (_replacementOptions.SourcePath.IsZipFile())
+            try
             {
-                ReplaceInZipFile();
+                if (_replacementOptions.SourcePath.IsZipFile())
+                {
+                    ReplaceInZipFile();
+                }
+                else
+                {
+                    ReplaceInDirectory();
+                }
             }
-            else
+            catch
             {
-                ReplaceInDirectory();
+                if (Directory.Exists(_outputFolderPath))
+                {
+                    Directory.Delete(_outputFolderPath);
+                }
+
+                if (File.Exists(_outputFolderPath))
+                {
+                    File.Delete(_outputFolderPath);
+                }
+                throw;
             }
         }
 
@@ -86,13 +102,12 @@ namespace ProjectRenameTool.Console
             var sourceFile = new FileInfo(_replacementOptions.SourcePath);
             var newFileName = ReplacementHelper.ReplaceText(sourceFile.Name, _replacementOptions.Rules);
 
-            var outputZipFilePath = newFileName;
             if (!_outputFolderPath.EndsWith(newFileName))
             {
-                outputZipFilePath = Path.Combine(_outputFolderPath, $"{newFileName}");
+                _outputFolderPath = Path.Combine(_outputFolderPath, $"{newFileName}");
             }
 
-            _outputFileEntryList.SaveToZipFile(outputZipFilePath);
+            _outputFileEntryList.SaveToZipFile(_outputFolderPath);
         }
 
         private void ReplaceInDirectory()
