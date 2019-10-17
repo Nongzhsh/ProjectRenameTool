@@ -49,7 +49,7 @@ namespace ProjectRenameTool.Console
             var options = serviceProvider.GetService<IWritableOptions<ReplacementOptions>>().Value;
             WriteLine($@"ReplacementOptions：{Environment.NewLine}{options}{Environment.NewLine}");
 
-            WriteLine($"{Environment.NewLine}是否继续？ Y/任意键");
+            WriteLine($"{Environment.NewLine}是否继续？ Y/任意键退出");
             if (ReadLine().Trim().ToLower() == "y")
             {
                 var renamer = serviceProvider.GetService<Renamer>();
@@ -57,10 +57,10 @@ namespace ProjectRenameTool.Console
 
                 watch.Stop();
                 WriteLine($"{Environment.NewLine}已完成，耗时 {watch.Elapsed.TotalSeconds} 秒。");
+                ReadKey();
             }
 
             #endregion
-            ReadKey();
         }
 
         private static IConfigurationRoot BuildConfiguration()
