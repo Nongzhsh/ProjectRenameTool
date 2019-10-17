@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using Awesome.Net.WritableOptions;
 using Awesome.Net.WritableOptions.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,12 +45,19 @@ namespace ProjectRenameTool.Console
             var watch = Stopwatch.StartNew();
 
             var serviceProvider = services.BuildServiceProvider();
-            var renamer = serviceProvider.GetService<Renamer>();
-            renamer.Run();
 
-            watch.Stop();
+            var options = serviceProvider.GetService<IWritableOptions<ReplacementOptions>>().Value;
+            WriteLine($@"ReplacementOptions：{Environment.NewLine}{options}{Environment.NewLine}");
 
-            WriteLine($"{Environment.NewLine}已完成，耗时 {watch.Elapsed.TotalSeconds} 秒。");
+            WriteLine($"{Environment.NewLine}是否继续？ Y/任意键");
+            if (ReadLine().Trim().ToLower() == "y")
+            {
+                var renamer = serviceProvider.GetService<Renamer>();
+                renamer.Run();
+
+                watch.Stop();
+                WriteLine($"{Environment.NewLine}已完成，耗时 {watch.Elapsed.TotalSeconds} 秒。");
+            }
 
             #endregion
             ReadKey();

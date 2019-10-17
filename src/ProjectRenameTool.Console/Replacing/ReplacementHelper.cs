@@ -13,7 +13,7 @@ namespace ProjectRenameTool.Console.Replacing
     {
         public static string ReplaceText(string text, ReplacementRule rule)
         {
-            if(!rule.OldValue.IsNullOrEmpty() && !rule.NewValue.IsNullOrEmpty())
+            if (!rule.OldValue.IsNullOrEmpty() && !rule.NewValue.IsNullOrEmpty())
             {
                 var oldValue = rule.OldValue;
                 var newValue = rule.NewValue;
@@ -30,7 +30,7 @@ namespace ProjectRenameTool.Console.Replacing
 
         public static string ReplaceText(string text, List<ReplacementRule> rules)
         {
-            foreach(var rule in rules)
+            foreach (var rule in rules)
             {
                 text = ReplaceText(text, rule);
             }
@@ -45,12 +45,21 @@ namespace ProjectRenameTool.Console.Replacing
         /// <param name="rules">文件名/内容替换的配置</param>
         public static void Replace(FileEntry entry, List<ReplacementRule> rules)
         {
-            foreach(var rule in rules)
+            foreach (var rule in rules)
             {
-                if(!rule.OldValue.IsNullOrEmpty() && !rule.NewValue.IsNullOrEmpty())
+                if (rule.OldValue.IsNullOrEmpty() || rule.NewValue.IsNullOrEmpty())
+                {
+                    continue;
+                }
+
+                if (rule.ReplaceContent)
+                {
+                    ReplaceFileEntryContent(entry, rule);
+                }
+
+                if (rule.ReplaceName)
                 {
                     ReplaceFileEntryName(entry, rule);
-                    ReplaceFileEntryContent(entry, rule);
                 }
             }
         }
@@ -62,7 +71,7 @@ namespace ProjectRenameTool.Console.Replacing
         /// <param name="rules">文件名/内容替换的配置</param>
         public static void ReplaceAll(IEnumerable<FileEntry> entries, List<ReplacementRule> rules)
         {
-            foreach(var entry in entries)
+            foreach (var entry in entries)
             {
                 Replace(entry, rules);
             }
@@ -71,10 +80,10 @@ namespace ProjectRenameTool.Console.Replacing
         private static void ReplaceFileEntryName(FileEntry entry, ReplacementRule rule)
         {
             // 合法的名称才进行更名
-            if(rule.NewValue.IndexOfAny(Path.GetInvalidFileNameChars()) < 0)
+            if (rule.NewValue.IndexOfAny(Path.GetInvalidFileNameChars()) < 0)
             {
                 var newName = ReplaceText(entry.Name, rule);
-                if(newName != entry.Name)
+                if (newName != entry.Name)
                 {
                     entry.SetName(newName);
                 }
@@ -83,12 +92,12 @@ namespace ProjectRenameTool.Console.Replacing
 
         private static void ReplaceFileEntryContent(FileEntry entry, ReplacementRule rule)
         {
-            if(entry.IsDirectory || entry.IsBinaryFile)
+            if (entry.IsDirectory || entry.IsBinaryFile)
             {
                 return;
             }
             var newContent = ReplaceText(entry.Content, rule);
-            if(newContent != entry.Content)
+            if (newContent != entry.Content)
             {
                 entry.NormalizeLineEndings();
                 entry.SetContent(newContent);

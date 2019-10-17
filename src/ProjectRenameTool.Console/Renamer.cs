@@ -29,8 +29,6 @@ namespace ProjectRenameTool.Console
 
         public void Run()
         {
-            WriteLine($@"ReplacementOptions：{Environment.NewLine}{_replacementOptions}{Environment.NewLine}");
-
             LoadIgnoreGlobRules();
             ReplaceAll();
         }

@@ -44,7 +44,6 @@ namespace ProjectRenameTool.Console.Replacing
         {
             new ReplacementRule
             {
-                MatchCase = true,
                 NewValue = "NewCompanyName1",
                 OldValue = "OldCompanyName1"
             },
@@ -84,5 +83,15 @@ namespace ProjectRenameTool.Console.Replacing
         /// 匹配大小写
         /// </summary>
         public bool MatchCase { get; set; } = true;
+
+        /// <summary>
+        /// 是否替换名称
+        /// </summary>
+        public bool ReplaceName { get; set; } = true;
+
+        /// <summary>
+        /// 是否替换内容
+        /// </summary>
+        public bool ReplaceContent { get; set; } = true;
     }
 }
