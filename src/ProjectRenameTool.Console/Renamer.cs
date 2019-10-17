@@ -198,13 +198,13 @@ namespace ProjectRenameTool.Console
                         }
 
                         entry.SetName(newName);
-                        WriteLine($"已处理：{entry}");
+                        WriteLine($"{entry}");
                     }
                 }
                 else
                 {
                     ReplacementHelper.Replace(entry, _replacementOptions.Rules);
-                    WriteLine($"已处理：{entry}");
+                    WriteLine($"{entry}");
                 }
             }
 
