@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace ProjectRenameTool.Console.Replacing
@@ -10,6 +11,19 @@ namespace ProjectRenameTool.Console.Replacing
     public class ReplacementOptions
     {
         private string _outputFolderPath = string.Empty;
+        private IEnumerable<ReplacementRule> _rules = new List<ReplacementRule>
+        {
+            new ReplacementRule
+            {
+                NewValue = "NewCompanyName1",
+                OldValue = "OldCompanyName1"
+            },
+            new ReplacementRule
+            {
+                NewValue = "NewCompanyName2",
+                OldValue = "OldCompanyName2"
+            }
+        };
 
         /// <summary>
         /// 输出的文件夹
@@ -40,19 +54,11 @@ namespace ProjectRenameTool.Console.Replacing
         /// <summary>
         /// 待替换的条目列表
         /// </summary>
-        public List<ReplacementRule> Rules { get; set; } = new List<ReplacementRule>
+        public IEnumerable<ReplacementRule> Rules
         {
-            new ReplacementRule
-            {
-                NewValue = "NewCompanyName1",
-                OldValue = "OldCompanyName1"
-            },
-            new ReplacementRule
-            {
-                NewValue = "NewCompanyName2",
-                OldValue = "OldCompanyName2"
-            }
-        };
+            get => _rules.Distinct();
+            set => _rules = value;
+        }
 
         /// <inheritdoc />
         public override string ToString()
@@ -93,5 +99,43 @@ namespace ProjectRenameTool.Console.Replacing
         /// 是否替换内容
         /// </summary>
         public bool ReplaceContent { get; set; } = true;
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (!(obj is ReplacementRule item))
+            {
+                return false;
+            }
+
+            return item.MatchCase == MatchCase &&
+                   item.ReplaceContent == ReplaceContent &&
+                   item.ReplaceName == ReplaceName &&
+                   item.NewValue == NewValue &&
+                   item.OldValue == OldValue;
+        }
+
+        protected bool Equals(ReplacementRule other)
+        {
+            return OldValue == other.OldValue &&
+                   NewValue == other.NewValue &&
+                   MatchCase == other.MatchCase &&
+                   ReplaceName == other.ReplaceName &&
+                   ReplaceContent == other.ReplaceContent;
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (OldValue != null ? OldValue.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (NewValue != null ? NewValue.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ MatchCase.GetHashCode();
+                hashCode = (hashCode * 397) ^ ReplaceName.GetHashCode();
+                hashCode = (hashCode * 397) ^ ReplaceContent.GetHashCode();
+                return hashCode;
+            }
+        }
     }
 }
