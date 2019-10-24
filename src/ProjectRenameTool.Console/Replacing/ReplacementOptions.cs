@@ -15,13 +15,8 @@ namespace ProjectRenameTool.Console.Replacing
         {
             new ReplacementRule
             {
-                NewValue = "NewCompanyName1",
-                OldValue = "OldCompanyName1"
-            },
-            new ReplacementRule
-            {
-                NewValue = "NewCompanyName2",
-                OldValue = "OldCompanyName2"
+                NewValue = "",
+                OldValue = ""
             }
         };
 
