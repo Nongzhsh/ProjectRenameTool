@@ -11,7 +11,7 @@ namespace ProjectRenameTool.Console.Replacing
     public class ReplacementOptions
     {
         private string _outputFolderPath = string.Empty;
-        private IEnumerable<ReplacementRule> _rules = new List<ReplacementRule>
+        private List<ReplacementRule> _rules = new List<ReplacementRule>
         {
             new ReplacementRule
             {
@@ -54,9 +54,9 @@ namespace ProjectRenameTool.Console.Replacing
         /// <summary>
         /// 待替换的条目列表
         /// </summary>
-        public IEnumerable<ReplacementRule> Rules
+        public List<ReplacementRule> Rules
         {
-            get => _rules.Distinct();
+            get => _rules.Distinct().ToList();
             set => _rules = value;
         }
 
