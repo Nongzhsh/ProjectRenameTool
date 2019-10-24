@@ -18,11 +18,19 @@ namespace ProjectRenameTool.Console.Replacing
                 var oldValue = rule.OldValue;
                 var newValue = rule.NewValue;
 
-                var newText = rule.MatchCase
-                    ? text.Replace(oldValue, newValue)
-                    : text.Replace(oldValue, newValue, StringComparison.CurrentCultureIgnoreCase);
+                if (rule.OldValue != rule.NewValue)
+                {
+                    var newText = rule.MatchCase
+                        ? text.Replace(oldValue, newValue)
+                        : text.Replace(oldValue, newValue, StringComparison.CurrentCultureIgnoreCase);
 
-                return newText;
+                    return newText;
+                }
+
+                if (rule.MatchCase)
+                {
+                    return text.Replace(oldValue, newValue, StringComparison.CurrentCultureIgnoreCase);
+                }
             }
 
             return text;
@@ -88,6 +96,7 @@ namespace ProjectRenameTool.Console.Replacing
                     entry.SetName(newName);
                 }
             }
+            throw new InvalidOperationException("You can not use special characters to set the file name.");
         }
 
         private static void ReplaceFileEntryContent(FileEntry entry, ReplacementRule rule)

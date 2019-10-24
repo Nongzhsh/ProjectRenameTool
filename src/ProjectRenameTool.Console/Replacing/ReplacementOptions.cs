@@ -51,7 +51,7 @@ namespace ProjectRenameTool.Console.Replacing
         /// </summary>
         public List<ReplacementRule> Rules
         {
-            get => _rules.Where(x => x.NewValue != x.OldValue).Distinct().ToList();
+            get => _rules/*.Where(x => x.NewValue != x.OldValue)*/.Distinct().ToList();
             set => _rules = value;
         }
 
