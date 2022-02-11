@@ -22,14 +22,14 @@ namespace ProjectRenameTool.Console.Replacing
                 {
                     var newText = rule.MatchCase
                         ? text.Replace(oldValue, newValue)
-                        : text.Replace(oldValue, newValue, StringComparison.CurrentCultureIgnoreCase);
+                        : text.Replace(oldValue, newValue, StringComparison.OrdinalIgnoreCase);
 
                     return newText;
                 }
 
                 if (rule.MatchCase)
                 {
-                    return text.Replace(oldValue, newValue, StringComparison.CurrentCultureIgnoreCase);
+                    return text.Replace(oldValue, newValue, StringComparison.OrdinalIgnoreCase);
                 }
             }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using Awesome.Net.WritableOptions;
 using Awesome.Net.WritableOptions.Extensions;
 using Microsoft.Extensions.Configuration;
@@ -14,7 +15,7 @@ namespace ProjectRenameTool.Console
     {
         public static readonly string BasePath = Directory.GetCurrentDirectory();
 
-        static void Main()
+        static async Task Main()
         {
             WindowWidth = 120;
             BufferHeight = 1000;
@@ -46,14 +47,14 @@ namespace ProjectRenameTool.Console
 
             var serviceProvider = services.BuildServiceProvider();
 
-            var options = serviceProvider.GetService<IWritableOptions<ReplacementOptions>>().Value;
+            var options = serviceProvider.GetService<IWritableOptions<ReplacementOptions>>()?.Value;
             WriteLine($@"ReplacementOptions：{Environment.NewLine}{options}{Environment.NewLine}");
 
             WriteLine($"{Environment.NewLine}是否继续？ Y/任意键退出");
             if (ReadLine().Trim().ToLower() == "y")
             {
                 var renamer = serviceProvider.GetService<Renamer>();
-                renamer.Run();
+                await renamer.RunAsync();
 
                 watch.Stop();
                 WriteLine($"{Environment.NewLine}已完成，耗时 {watch.Elapsed.TotalSeconds} 秒。");

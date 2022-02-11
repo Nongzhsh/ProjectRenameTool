@@ -8,7 +8,7 @@ namespace ProjectRenameTool.Console.Files
 {
     public class FileEntry
     {
-        private static readonly string[] _binaryFileExtensions = {
+        private static readonly string[] BinaryFileExtensions = {
             ".exe", ".dll", ".bin",
             ".suo", ".obj", ".pdb",
             ".png", "jpg", "jpeg", ".ico"
@@ -121,7 +121,7 @@ namespace ProjectRenameTool.Console.Files
 
         private bool CalculateIsBinaryFile()
         {
-            return _binaryFileExtensions.Any(ext => Name.EndsWith(ext));
+            return BinaryFileExtensions.Any(ext => Name.EndsWith(ext));
         }
     }
 }

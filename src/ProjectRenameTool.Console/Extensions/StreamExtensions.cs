@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace ProjectRenameTool.Console.Extensions
 {
@@ -10,11 +11,11 @@ namespace ProjectRenameTool.Console.Extensions
         /// <summary>
         /// 获取全部字节
         /// </summary>
-        public static byte[] GetAllBytes(this Stream stream)
+        public static async Task<byte[]> GetAllBytesAsync(this Stream stream)
         {
             using (var memoryStream = new MemoryStream())
             {
-                stream.CopyTo(memoryStream);
+                await stream.CopyToAsync(memoryStream);
                 return memoryStream.ToArray();
             }
         }

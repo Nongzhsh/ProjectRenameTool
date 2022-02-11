@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
 
 namespace ProjectRenameTool.Console.Files
@@ -8,7 +9,7 @@ namespace ProjectRenameTool.Console.Files
     /// </summary>
     public static class FileEntryListExtensions
     {
-        public static byte[] CreateZipFileFromEntries(this FileEntryList entries)
+        public static async Task<byte[]> CreateZipFileFromEntriesAsync(this FileEntryList entries)
         {
             using (var memoryStream = new MemoryStream())
             {
@@ -22,7 +23,7 @@ namespace ProjectRenameTool.Console.Files
                         {
                             Size = entry.Bytes.Length
                         });
-                        zipOutputStream.Write(entry.Bytes, 0, entry.Bytes.Length);
+                        await zipOutputStream.WriteAsync(entry.Bytes, 0, entry.Bytes.Length);
                     }
 
                     zipOutputStream.CloseEntry();
@@ -34,15 +35,15 @@ namespace ProjectRenameTool.Console.Files
             }
         }
 
-        public static void SaveToZipFile(this FileEntryList fileEntryList, string outputZipFilePath)
+        public static async Task SaveToZipFileAsync(this FileEntryList fileEntryList, string outputZipFilePath)
         {
-            var zipContent = fileEntryList.CreateZipFileFromEntries();
+            var zipContent = await fileEntryList.CreateZipFileFromEntriesAsync();
             using (var templateFileStream = new MemoryStream(zipContent))
             {
                 using (var fileStream = new FileStream($@"{outputZipFilePath}", FileMode.Create))
                 {
                     templateFileStream.Seek(0, SeekOrigin.Begin);
-                    templateFileStream.CopyTo(fileStream);
+                    await templateFileStream.CopyToAsync(fileStream);
                 }
             }
         }

@@ -11,7 +11,7 @@ namespace ProjectRenameTool.Console.Replacing
     public class ReplacementOptions
     {
         private string _outputFolderPath = string.Empty;
-        private List<ReplacementRule> _rules = new List<ReplacementRule>
+        private List<ReplacementRule> _rules = new()
         {
             new ReplacementRule
             {
@@ -51,7 +51,7 @@ namespace ProjectRenameTool.Console.Replacing
         /// </summary>
         public List<ReplacementRule> Rules
         {
-            get => _rules/*.Where(x => x.NewValue != x.OldValue)*/.Distinct().ToList();
+            get => _rules.Distinct().ToList();
             set => _rules = value;
         }
 
@@ -95,42 +95,22 @@ namespace ProjectRenameTool.Console.Replacing
         /// </summary>
         public bool ReplaceContent { get; set; } = true;
 
-        /// <inheritdoc />
-        public override bool Equals(object obj)
-        {
-            if (!(obj is ReplacementRule item))
-            {
-                return false;
-            }
-
-            return item.MatchCase == MatchCase &&
-                   item.ReplaceContent == ReplaceContent &&
-                   item.ReplaceName == ReplaceName &&
-                   item.NewValue == NewValue &&
-                   item.OldValue == OldValue;
-        }
-
         protected bool Equals(ReplacementRule other)
         {
-            return OldValue == other.OldValue &&
-                   NewValue == other.NewValue &&
-                   MatchCase == other.MatchCase &&
-                   ReplaceName == other.ReplaceName &&
-                   ReplaceContent == other.ReplaceContent;
+            return OldValue == other.OldValue && NewValue == other.NewValue && MatchCase == other.MatchCase && ReplaceName == other.ReplaceName && ReplaceContent == other.ReplaceContent;
         }
 
-        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((ReplacementRule) obj);
+        }
+
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hashCode = (OldValue != null ? OldValue.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (NewValue != null ? NewValue.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ MatchCase.GetHashCode();
-                hashCode = (hashCode * 397) ^ ReplaceName.GetHashCode();
-                hashCode = (hashCode * 397) ^ ReplaceContent.GetHashCode();
-                return hashCode;
-            }
+            return HashCode.Combine(OldValue, NewValue, MatchCase, ReplaceName, ReplaceContent);
         }
     }
 }

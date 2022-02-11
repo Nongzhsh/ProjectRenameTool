@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Awesome.Net.IgnoreParser;
 using Awesome.Net.WritableOptions;
 using ProjectRenameTool.Console.Extensions;
@@ -15,11 +16,11 @@ namespace ProjectRenameTool.Console
     public class Renamer
     {
         private readonly ReplacementOptions _replacementOptions;
-        private readonly IgnoreParser _ignoreCopyParser = new IgnoreParser("CopyParser");
-        private readonly IgnoreParser _ignoreReplaceParser = new IgnoreParser("ReplaceParser");
+        private readonly IgnoreParser _ignoreCopyParser = new("CopyParser");
+        private readonly IgnoreParser _ignoreReplaceParser = new("ReplaceParser");
 
         private string _outputFolderPath;
-        private readonly FileEntryList _outputFileEntryList = new FileEntryList(new List<FileEntry>());
+        private readonly FileEntryList _outputFileEntryList = new(new List<FileEntry>());
 
         public Renamer(IWritableOptions<ReplacementOptions> options)
         {
@@ -27,10 +28,10 @@ namespace ProjectRenameTool.Console
             _outputFolderPath = _replacementOptions.OutputFolderPath;
         }
 
-        public void Run()
+        public async Task RunAsync()
         {
             LoadIgnoreGlobRules();
-            ReplaceAll();
+           await ReplaceAllAsync();
         }
 
         private void LoadIgnoreGlobRules()
@@ -48,17 +49,17 @@ namespace ProjectRenameTool.Console
 
         }
 
-        private void ReplaceAll()
+        private async Task ReplaceAllAsync()
         {
             try
             {
                 if (_replacementOptions.SourcePath.IsZipFile())
                 {
-                    ReplaceInZipFile();
+                 await   ReplaceInZipFileAsync();
                 }
                 else
                 {
-                    ReplaceInDirectory();
+                  await  ReplaceInDirectoryAsync();
                 }
             }
             catch
@@ -76,7 +77,7 @@ namespace ProjectRenameTool.Console
             }
         }
 
-        private void ReplaceInZipFile()
+        private async Task ReplaceInZipFileAsync()
         {
             var entries = _replacementOptions.SourcePath.ToFileEntryList();
             var ignoreFiles = entries.Where(x => x.Name.EndsWith(".gitignore"));
@@ -105,10 +106,10 @@ namespace ProjectRenameTool.Console
                 _outputFolderPath = Path.Combine(_outputFolderPath, $"{newFileName}");
             }
 
-            _outputFileEntryList.SaveToZipFile(_outputFolderPath);
+            await _outputFileEntryList.SaveToZipFileAsync(_outputFolderPath);
         }
 
-        private void ReplaceInDirectory()
+        private async Task ReplaceInDirectoryAsync()
         {
             var rootFolder = new DirectoryInfo(_replacementOptions.SourcePath);
             var newFolderName = ReplacementHelper.ReplaceText(rootFolder.Name, _replacementOptions.Rules);
@@ -123,12 +124,12 @@ namespace ProjectRenameTool.Console
             var ignoreFiles = rootFolder.GetFiles(".gitignore", SearchOption.AllDirectories);
             _ignoreCopyParser.AddIgnoreFiles(ignoreFiles);
 
-            CopyAndReplace(rootFolder);
+            await CopyAndReplace(rootFolder);
 
             //TODO:保存 zip？
         }
 
-        private void CopyAndReplace(DirectoryInfo source)
+        private async Task CopyAndReplace(DirectoryInfo source)
         {
             foreach (var file in source.GetFiles())
             {
@@ -142,14 +143,17 @@ namespace ProjectRenameTool.Console
                     // 相对原解决方案的路径
                     var entryName = file.FullName.RemovePreFix(_replacementOptions.SourcePath);
 
-                    var entry = new FileEntry(entryName, fileStream.GetAllBytes(), false);
+                    var entry = new FileEntry(entryName, await fileStream.GetAllBytesAsync(), false);
 
                     entry = Replace(file.FullName, entry);
 
                     var newFilePath = Path.Combine(_outputFolderPath, entry.Name.TrimStart(Path.DirectorySeparatorChar));
-                    Directory.CreateDirectory(Path.GetDirectoryName(newFilePath));
+                    if (!Path.GetDirectoryName(newFilePath).IsNullOrEmpty())
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(newFilePath));
+                    }
 
-                    File.WriteAllBytes(newFilePath, entry.Bytes);
+                    await File.WriteAllBytesAsync(newFilePath, entry.Bytes);
 
                     _outputFileEntryList.Add(entry);
                 }
@@ -172,7 +176,7 @@ namespace ProjectRenameTool.Console
 
                 _outputFileEntryList.Add(entry);
 
-                CopyAndReplace(dir);
+                await CopyAndReplace(dir);
             }
         }
 
