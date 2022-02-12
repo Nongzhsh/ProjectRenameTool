@@ -99,10 +99,9 @@ namespace ProjectRenameTool.Console
 
         private static void ConfigureServices(IServiceCollection services, IConfigurationRoot config)
         {
-            services.AddSingleton(config);
             services.AddOptions();
 
-            services.ConfigureWritableOptions<ReplacementOptions>(config.GetSection(nameof(ReplacementOptions)));
+            services.ConfigureWritableOptions<ReplacementOptions>(config,nameof(ReplacementOptions));
 
             services.AddTransient<Renamer>();
         }

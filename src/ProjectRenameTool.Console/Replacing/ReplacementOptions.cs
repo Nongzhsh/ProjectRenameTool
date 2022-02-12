@@ -20,6 +20,9 @@ namespace ProjectRenameTool.Console.Replacing
             }
         };
 
+        private string[] _ignoreCopyGlobRules = { ".github/" };
+        private string[] _ignoreReplaceGlobRules = { "fonts/" };
+
         /// <summary>
         /// 输出的文件夹
         /// </summary>
@@ -39,12 +42,20 @@ namespace ProjectRenameTool.Console.Replacing
         /// <summary>
         /// 自定义忽略拷贝规则（同.gitignore 格式）
         /// </summary>
-        public string[] IgnoreCopyGlobRules { get; set; } = { ".github/" };
+        public string[] IgnoreCopyGlobRules
+        {
+            get => _ignoreCopyGlobRules.Distinct().ToArray();
+            set => _ignoreCopyGlobRules = value;
+        }
 
         /// <summary>
         /// 自定义忽略替换规则（同.gitignore 格式）
         /// </summary>
-        public string[] IgnoreReplaceGlobRules { get; set; } = { "fonts/" };
+        public string[] IgnoreReplaceGlobRules
+        {
+            get => _ignoreReplaceGlobRules.Distinct().ToArray();
+            set => _ignoreReplaceGlobRules = value;
+        }
 
         /// <summary>
         /// 待替换的条目列表
@@ -97,20 +108,20 @@ namespace ProjectRenameTool.Console.Replacing
 
         protected bool Equals(ReplacementRule other)
         {
-            return OldValue == other.OldValue && NewValue == other.NewValue && MatchCase == other.MatchCase && ReplaceName == other.ReplaceName && ReplaceContent == other.ReplaceContent;
+            return GetHashCode() == other?.GetHashCode();
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((ReplacementRule) obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((ReplacementRule)obj);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(OldValue, NewValue, MatchCase, ReplaceName, ReplaceContent);
+            return (OldValue, NewValue, MatchCase, ReplaceName, ReplaceContent).GetHashCode();
         }
     }
 }
