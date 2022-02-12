@@ -66,7 +66,7 @@ namespace ProjectRenameTool.Console
 
         private static IConfigurationRoot BuildConfiguration()
         {
-            const string appConfigJsonName = "appsettings.json";
+            const string appConfigJsonName = "ProjectRenameTool.Settings.json";
 
             var appConfigJsonPath = Path.Combine(BasePath, appConfigJsonName);
 
@@ -76,7 +76,7 @@ namespace ProjectRenameTool.Console
             }
             else
             {
-                WriteLine($"{Environment.NewLine}是否重新生成 appsettings.json 文件？ Y/任意键");
+                WriteLine($"{Environment.NewLine}是否重新生成 ProjectRenameTool.Settings.json 文件？ Y/任意键");
                 if (ReadLine().Trim().ToLower() == "y")
                 {
                     JsonFileHelper.AddOrUpdateSection(appConfigJsonPath, nameof(ReplacementOptions), new ReplacementOptions());
@@ -84,7 +84,7 @@ namespace ProjectRenameTool.Console
             }
 
             ForegroundColor = ConsoleColor.Yellow;
-            WriteLine($"请先配置程序目录下的 appsettings.json 文件。");
+            WriteLine($"请先配置程序目录下的 ProjectRenameTool.Settings.json 文件。");
 
             ResetColor();
             WriteLine($"{Environment.NewLine}配置完成？任意键继续...");
