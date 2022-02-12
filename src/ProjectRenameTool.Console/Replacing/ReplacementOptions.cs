@@ -20,8 +20,8 @@ namespace ProjectRenameTool.Console.Replacing
             }
         };
 
-        private string[] _ignoreCopyGlobRules = { ".github/" };
-        private string[] _ignoreReplaceGlobRules = { "fonts/" };
+        private string[] _ignoreCopyGlobRules = { ".github/", ".git/" };
+        private string[] _ignoreReplaceGlobRules = { "fonts/", ".github/", ".git/" };
 
         /// <summary>
         /// 输出的文件夹
@@ -62,7 +62,7 @@ namespace ProjectRenameTool.Console.Replacing
         /// </summary>
         public List<ReplacementRule> Rules
         {
-            get => _rules.Distinct().ToList();
+            get => _rules.Distinct().Where(x => !string.IsNullOrEmpty(x.OldValue)).ToList();
             set => _rules = value;
         }
 
