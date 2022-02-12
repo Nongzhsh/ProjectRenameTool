@@ -96,7 +96,10 @@ namespace ProjectRenameTool.Console.Replacing
                     entry.SetName(newName);
                 }
             }
-            throw new InvalidOperationException("You can not use special characters to set the file name.");
+            else
+            {
+                throw new InvalidOperationException("You can not use special characters to set the file name.");
+            }
         }
 
         private static void ReplaceFileEntryContent(FileEntry entry, ReplacementRule rule)
